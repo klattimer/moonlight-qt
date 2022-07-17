@@ -143,6 +143,7 @@ SOURCES += \
     backend/richpresencemanager.cpp \
     cli/commandlineparser.cpp \
     cli/quitstream.cpp \
+    cli/listapps.cpp \
     cli/startstream.cpp \
     settings/compatfetcher.cpp \
     settings/mappingfetcher.cpp \
@@ -183,6 +184,7 @@ HEADERS += \
     backend/richpresencemanager.h \
     cli/commandlineparser.h \
     cli/quitstream.h \
+    cli/listapps.h \
     cli/startstream.h \
     settings/streamingpreferences.h \
     streaming/input/input.h \

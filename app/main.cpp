@@ -29,6 +29,7 @@
 #endif
 
 #include "cli/quitstream.h"
+#include "cli/listapps.h"
 #include "cli/startstream.h"
 #include "cli/commandlineparser.h"
 #include "path.h"
@@ -36,6 +37,7 @@
 #include "gui/computermodel.h"
 #include "gui/appmodel.h"
 #include "backend/autoupdatechecker.h"
+#include "backend/computermanager.h"
 #include "backend/systemproperties.h"
 #include "streaming/session.h"
 #include "settings/streamingpreferences.h"
@@ -583,6 +585,7 @@ int main(int argc, char *argv[])
 
     QQmlApplicationEngine engine;
     QString initialView;
+    bool hasGUI = true;
 
     GlobalCommandLineParser parser;
     switch (parser.parse(app.arguments())) {
@@ -610,9 +613,25 @@ int main(int argc, char *argv[])
             engine.rootContext()->setContextProperty("launcher", launcher);
             break;
         }
+    case GlobalCommandLineParser::ListRequested:
+        {
+            ListCommandLineParser listParser;
+            listParser.parse(app.arguments());
+            auto launcher = new CliListApps::Launcher(listParser.getHost(), listParser, &app);
+            launcher->execute(new ComputerManager(&app));
+            hasGUI = false;
+            break;
+        }
     }
 
-    engine.rootContext()->setContextProperty("initialView", initialView);
+    if (hasGUI) {
+        engine.rootContext()->setContextProperty("initialView", initialView);
+
+        // Load the main.qml file
+        engine.load(QUrl(QStringLiteral("qrc:/gui/main.qml")));
+        if (engine.rootObjects().isEmpty())
+            return -1;
+    }
 
     // Load the main.qml file
     engine.load(QUrl(QStringLiteral("qrc:/gui/main.qml")));
